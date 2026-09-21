@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b0d12" />
+
+  <title>Selah — Bible Reader</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,500&display=swap');
+
+    :root {
+      --bg: #090b10;
+      --panel: rgba(18, 21, 29, .72);
+      --text: #f5f1e8;
+      --muted: #989da8;
+      --gold: #d9b66f;
+      --gold-2: #f2d79d;
+      --line: rgba(255,255,255,.08);
+      --shadow: 0 28px 80px rgba(0,0,0,.42);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(
+          circle at 18% 10%,
+          rgba(217,182,111,.10),
+          transparent 32rem
+        ),
+        radial-gradient(
+          circle at 82% 72%,
+          rgba(81,101,148,.11),
+          transparent 35rem
+        ),
+        var(--bg);
+
+      color: var(--text);
+      font-family: "DM Sans", sans-serif;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .22;
+
+      background-image:
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.08'/%3E%3C/svg%3E");
+    }
+
+    .shell {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 42px 0 64px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 64px;
+    }
+
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      letter-spacing: .04em;
+      font-weight: 700;
+    }
+
+    .mark {
+      width: 34px;
+      height: 34px;
+      border: 1px solid rgba(217,182,111,.5);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--gold-2);
+      box-shadow:
+        inset 0 0 18px rgba(217,182,111,.08);
+      font-family: Georgia, serif;
+    }
+
+    .translation {
+      color: var(--muted);
+      font-size: .78rem;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+
+    .hero {
+      max-width: 800px;
+      margin-bottom: 46px;
+    }
+
+    .eyebrow {
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: .2em;
+      font-size: .72rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+
+    h1 {
+      font-family: "Playfair Display", serif;
+      font-size: clamp(3rem, 7vw, 6.3rem);
+      line-height: .96;
+      letter-spacing: -.045em;
+      margin: 0 0 20px;
+      font-weight: 600;
+    }
+
+    h1 em {
+      color: var(--gold-2);
+      font-weight: 500;
+    }
+
+    .hero p {
+      color: var(--muted);
+      max-width: 600px;
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+
+    .reader {
+      border: 1px solid var(--line);
+
+      background:
+        linear-gradient(
+          135deg,
+          rgba(24,27,36,.86),
+          rgba(14,16,22,.78)
+        );
+
+      backdrop-filter: blur(18px);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .selectors {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .select-wrap {
+      padding: 18px 22px 20px;
+      border-right: 1px solid var(--line);
+    }
+
+    .select-wrap:last-child {
+      border-right: 0;
+    }
+
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: .68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      margin-bottom: 8px;
+    }
+
+    select {
+      width: 100%;
+      appearance: none;
+      border: 0;
+      outline: 0;
+      background-color: transparent;
+      color: var(--text);
+      font: 600 1.08rem "DM Sans", sans-serif;
+      cursor: pointer;
+      padding: 3px 26px 3px 0;
+
+      background-image:
+        linear-gradient(
+          45deg,
+          transparent 50%,
+          var(--gold) 50%
+        ),
+        linear-gradient(
+          135deg,
+          var(--gold) 50%,
+          transparent 50%
+        );
+
+      background-position:
+        calc(100% - 10px) 50%,
+        calc(100% - 5px) 50%;
+
+      background-size:
+        5px 5px,
+        5px 5px;
+
+      background-repeat: no-repeat;
+    }
+
+    select option {
+      background: #161922;
+      color: white;
+    }
+
+    select:disabled {
+      opacity: .35;
+      cursor: not-allowed;
+    }
+
+    .verse-area {
+      min-height: 350px;
+      padding: clamp(30px, 6vw, 72px);
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      position: relative;
+    }
+
+    .verse-area::after {
+      content: "“";
+      position: absolute;
+      top: 10px;
+      right: 40px;
+      font: 11rem/1 Georgia, serif;
+      color: rgba(217,182,111,.045);
+      pointer-events: none;
+    }
+
+    #reference {
+      color: var(--gold);
+      font-size: .75rem;
+      letter-spacing: .19em;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 22px;
+    }
+
+    #verseText {
+      font-family:
+        "Playfair Display",
+        Georgia,
+        serif;
+
+      font-size: clamp(1.45rem, 3vw, 2.4rem);
+      line-height: 1.6;
+      max-width: 900px;
+      margin: 0;
+
+      transition:
+        opacity .2s ease,
+        transform .2s ease;
+    }
+
+    #verseText.loading {
+      opacity: .3;
+      transform: translateY(4px);
+    }
+
+    .scripture-paragraph {
+      margin: 0 0 1.35em 0;
+    }
+
+    .scripture-paragraph:last-child {
+      margin-bottom: 0;
+    }
+
+    .scripture-paragraph.p,
+    .scripture-paragraph.m,
+    .scripture-paragraph.nb {
+      margin-left: 0;
+    }
+
+    .scripture-paragraph.q,
+    .scripture-paragraph.q1 {
+      margin-left: 1.5em;
+    }
+
+    .scripture-paragraph.q2 {
+      margin-left: 3em;
+    }
+
+    .scripture-paragraph.q3 {
+      margin-left: 4.5em;
+    }
+
+    .scripture-paragraph.li,
+    .scripture-paragraph.li1 {
+      margin-left: 1.5em;
+    }
+
+    .scripture-paragraph.li2 {
+      margin-left: 3em;
+    }
+
+    .scripture-paragraph.li3 {
+      margin-left: 4.5em;
+    }
+
+    .verse {
+      display: inline;
+    }
+
+    .verse + .verse {
+      margin-left: .25em;
+    }
+
+    .verse-number {
+      color: var(--gold);
+      font-family: "DM Sans", sans-serif;
+      font-size: .48em;
+      font-weight: 700;
+      vertical-align: super;
+      margin-right: .2em;
+      user-select: none;
+    }
+
+    .hint {
+      color: #6f7480;
+      font-size: .9rem;
+      margin-top: 24px;
+    }
+
+    .error {
+      color: #e7a5a5 !important;
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      color: #626772;
+      font-size: .75rem;
+      margin-top: 24px;
+    }
+
+    @media (max-width: 850px) {
+      .selectors {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .select-wrap:nth-child(2) {
+        border-right: 0;
+      }
+
+      .select-wrap:nth-child(1),
+      .select-wrap:nth-child(2) {
+        border-bottom: 1px solid var(--line);
+      }
+    }
+
+    @media (max-width: 520px) {
+      .shell {
+        padding-top: 24px;
+      }
+
+      header {
+        margin-bottom: 46px;
+      }
+
+      .translation {
+        font-size: .62rem;
+      }
+
+      .selectors {
+        grid-template-columns: 1fr;
+      }
+
+      .select-wrap {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .select-wrap:nth-child(2) {
+        border-right: 0;
+      }
+
+      .select-wrap:last-child {
+        border-bottom: 0;
+      }
+
+      .verse-area {
+        min-height: 320px;
+      }
+
+      footer {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="shell">
+
+    <header>
+
+      <div class="brand">
+        <div class="mark">S</div>
+        <span>SELAH</span>
+      </div>
+
+      <div class="translation">
+        World English Bible
+      </div>
+
+    </header>
+
+
+    <section class="hero">
+
+      <div class="eyebrow">
+        Scripture, beautifully simple
+      </div>
+
+      <h1>
+        Find the words.<br>
+        <em>Stay awhile.</em>
+      </h1>
+
+      <p>
+        Choose a book, chapter, and passage.
+        No clutter, no distractions, just Scripture.
+      </p>
+
+    </section>
+
+
+    <section class="reader">
+
+      <div class="selectors">
+
+        <div class="select-wrap">
+          <label for="book">
+            Book
+          </label>
+
+          <select id="book">
+            <option value="">
+              Choose a book
+            </option>
+          </select>
+        </div>
+
+
+        <div class="select-wrap">
+          <label for="chapter">
+            Chapter
+          </label>
+
+          <select id="chapter" disabled>
+            <option value="">
+              Choose chapter
+            </option>
+          </select>
+        </div>
+
+
+        <div class="select-wrap">
+          <label for="verse">
+            Start Verse
+          </label>
+
+          <select id="verse" disabled>
+            <option value="">
+              Choose verse
+            </option>
+          </select>
+        </div>
+
+
+        <div class="select-wrap">
+          <label for="endVerse">
+            End Verse
+          </label>
+
+          <select id="endVerse" disabled>
+            <option value="">
+              Same verse
+            </option>
+          </select>
+        </div>
+
+      </div>
+
+
+      <div class="verse-area">
+
+        <div id="reference">
+          Begin reading
+        </div>
+
+        <div id="verseText">
+          Select a book above to begin.
+        </div>
+
+        <div
+          class="hint"
+          id="hint"
+        >
+          Your place in Scripture will appear here.
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <footer>
+
+      <span>
+        World English Bible
+      </span>
+
+      <span>
+        Built for quiet moments.
+      </span>
+
+    </footer>
+
+  </main>
+
+
+  <script>
+
+    const API_BASE_URL =
+      "https://29s9bsspd2.execute-api.us-east-1.amazonaws.com";
+
+
+    const bookSelect =
+      document.getElementById("book");
+
+    const chapterSelect =
+      document.getElementById("chapter");
+
+    const verseSelect =
+      document.getElementById("verse");
+
+    const endVerseSelect =
+      document.getElementById("endVerse");
+
+    const verseText =
+      document.getElementById("verseText");
+
+    const reference =
+      document.getElementById("reference");
+
+    const hint =
+      document.getElementById("hint");
+
+
+    function setLoading(message = "Loading…") {
+      verseText.classList.add("loading");
+      hint.textContent = message;
+    }
+
+
+    function clearLoading() {
+      verseText.classList.remove("loading");
+    }
+
+
+    function showError(message) {
+      clearLoading();
+
+      verseText.textContent = message;
+      verseText.classList.add("error");
+
+      reference.textContent =
+        "Something went wrong";
+
+      hint.textContent =
+        "Unable to load Scripture.";
+    }
+
+
+    function resetSelect(
+      select,
+      placeholder
+    ) {
+      select.innerHTML =
+        `<option value="">${placeholder}</option>`;
+
+      select.disabled = true;
+    }
+
+
+    function escapeHtml(text) {
+      const div =
+        document.createElement("div");
+
+      div.textContent =
+        text ?? "";
+
+      return div.innerHTML;
+    }
+
+
+    async function api(path) {
+      const response =
+        await fetch(
+          `${API_BASE_URL}${path}`
+        );
+
+      if (!response.ok) {
+        throw new Error(
+          `API returned ${response.status}`
+        );
+      }
+
+      return response.json();
+    }
+
+
+    function getInitialParams() {
+      const params =
+        new URLSearchParams(
+          window.location.search
+        );
+
+      const verseParam =
+        params.get("verse");
+
+      let startVerse = null;
+      let endVerse = null;
+
+      if (verseParam) {
+        if (verseParam.includes("-")) {
+          const parts =
+            verseParam.split("-");
+
+          startVerse =
+            parts[0];
+
+          endVerse =
+            parts[1];
+        } else {
+          startVerse =
+            verseParam;
+        }
+      }
+
+      return {
+        book: params.get("book"),
+        chapter: params.get("chapter"),
+        startVerse,
+        endVerse
+      };
+    }
+
+
+    function updateUrl(
+      book,
+      chapter = null,
+      startVerse = null,
+      endVerse = null
+    ) {
+      const url =
+        new URL(
+          window.location.href
+        );
+
+      if (book) {
+        url.searchParams.set(
+          "book",
+          book
+        );
+      } else {
+        url.searchParams.delete(
+          "book"
+        );
+      }
+
+
+      if (chapter) {
+        url.searchParams.set(
+          "chapter",
+          chapter
+        );
+      } else {
+        url.searchParams.delete(
+          "chapter"
+        );
+      }
+
+
+      if (startVerse) {
+        let value =
+          String(startVerse);
+
+        if (
+          endVerse &&
+          Number(endVerse) >
+          Number(startVerse)
+        ) {
+          value += `-${endVerse}`;
+        }
+
+        url.searchParams.set(
+          "verse",
+          value
+        );
+      } else {
+        url.searchParams.delete(
+          "verse"
+        );
+      }
+
+
+      history.replaceState(
+        {},
+        "",
+        url
+      );
+    }
+
+
+    function renderPassage(verses) {
+      if (
+        !Array.isArray(verses) ||
+        verses.length === 0
+      ) {
+        return "";
+      }
+
+      let html = "";
+      let currentParagraphId = null;
+      let paragraphOpen = false;
+
+      verses.forEach(
+        (item, index) => {
+
+          const paragraphId =
+            item.paragraphId ?? `verse-${item.verse}`;
+
+          const style =
+            item.paragraphStyle || "p";
+
+          const isNewParagraph =
+            paragraphId !== currentParagraphId;
+
+
+          if (isNewParagraph) {
+            if (paragraphOpen) {
+              html += "</p>";
+            }
+
+            html += `
+              <p class="scripture-paragraph ${escapeHtml(style)}">
+            `;
+
+            paragraphOpen = true;
+
+            currentParagraphId =
+              paragraphId;
+          }
+
+
+          html += `
+            <span class="verse">
+              <sup class="verse-number">
+                ${item.verse}
+              </sup>${escapeHtml(item.text)}
+            </span>
+          `;
+        }
+      );
+
+
+      if (paragraphOpen) {
+        html += "</p>";
+      }
+
+      return html;
+    }
+
+
+    async function loadBooks(
+      selectedBook = null
+    ) {
+      setLoading(
+        "Loading books…"
+      );
+
+      const data =
+        await api("/books");
+
+
+      data.books.forEach(
+        book => {
+
+          const option =
+            document.createElement(
+              "option"
+            );
+
+          option.value =
+            book.code;
+
+          option.textContent =
+            book.name;
+
+          option.dataset.name =
+            book.name;
+
+          option.dataset.id =
+            book.id;
+
+          option.dataset.abbreviation =
+            book.abbreviation;
+
+          bookSelect.appendChild(
+            option
+          );
+        }
+      );
+
+
+      clearLoading();
+
+
+      if (selectedBook) {
+        const match =
+          data.books.find(
+            book =>
+
+              String(book.code)
+                .toLowerCase() ===
+              String(selectedBook)
+                .toLowerCase()
+
+              ||
+
+              String(book.name)
+                .toLowerCase() ===
+              String(selectedBook)
+                .toLowerCase()
+
+              ||
+
+              String(book.abbreviation)
+                .toLowerCase() ===
+              String(selectedBook)
+                .toLowerCase()
+
+              ||
+
+              String(book.id) ===
+              String(selectedBook)
+          );
+
+
+        if (match) {
+          bookSelect.value =
+            match.code;
+
+          return match;
+        }
+      }
+
+
+      verseText.textContent =
+        "Select a book above to begin.";
+
+      hint.textContent =
+        "Your place in Scripture will appear here.";
+
+      return null;
+    }
+
+
+    async function loadChapters(
+      bookCode,
+      selectedChapter = null
+    ) {
+      resetSelect(
+        chapterSelect,
+        "Choose chapter"
+      );
+
+      resetSelect(
+        verseSelect,
+        "Choose verse"
+      );
+
+      resetSelect(
+        endVerseSelect,
+        "Same verse"
+      );
+
+
+      if (!bookCode) {
+        return null;
+      }
+
+
+      setLoading(
+        "Loading chapters…"
+      );
+
+
+      const data =
+        await api(
+          `/books/${encodeURIComponent(bookCode)}/chapters`
+        );
+
+
+      data.chapters.forEach(
+        chapter => {
+
+          const option =
+            document.createElement(
+              "option"
+            );
+
+          option.value =
+            chapter;
+
+          option.textContent =
+            chapter;
+
+          chapterSelect.appendChild(
+            option
+          );
+        }
+      );
+
+
+      chapterSelect.disabled =
+        false;
+
+
+      reference.textContent =
+        data.book.name;
+
+      verseText.textContent =
+        "Choose a chapter.";
+
+      hint.textContent =
+        `${data.chapters.length} chapters`;
+
+
+      clearLoading();
+
+
+      if (
+        selectedChapter &&
+        data.chapters
+          .map(String)
+          .includes(
+            String(selectedChapter)
+          )
+      ) {
+        chapterSelect.value =
+          String(selectedChapter);
+
+        return Number(
+          selectedChapter
+        );
+      }
+
+
+      return null;
+    }
+
+
+    async function loadVerses(
+      bookCode,
+      chapter,
+      selectedVerse = null,
+      selectedEndVerse = null
+    ) {
+      resetSelect(
+        verseSelect,
+        "Choose verse"
+      );
+
+      resetSelect(
+        endVerseSelect,
+        "Same verse"
+      );
+
+
+      if (
+        !bookCode ||
+        !chapter
+      ) {
+        return null;
+      }
+
+
+      setLoading(
+        "Loading verses…"
+      );
+
+
+      const data =
+        await api(
+          `/books/${encodeURIComponent(bookCode)}` +
+          `/chapters/${chapter}/verses`
+        );
+
+
+      data.verses.forEach(
+        item => {
+
+          const option =
+            document.createElement(
+              "option"
+            );
+
+          option.value =
+            item.verse;
+
+          option.textContent =
+            item.verse;
+
+          verseSelect.appendChild(
+            option
+          );
+        }
+      );
+
+
+      verseSelect.disabled =
+        false;
+
+
+      reference.textContent =
+        `${data.book.name} ${data.chapter}`;
+
+      verseText.textContent =
+        "Choose a verse.";
+
+      hint.textContent =
+        `${data.verses.length} verses`;
+
+
+      clearLoading();
+
+
+      if (
+        selectedVerse &&
+        data.verses.some(
+          item =>
+            String(item.verse) ===
+            String(selectedVerse)
+        )
+      ) {
+        verseSelect.value =
+          String(selectedVerse);
+
+        populateEndVerses(
+          data.verses,
+          Number(selectedVerse)
+        );
+
+
+        if (
+          selectedEndVerse &&
+          Number(selectedEndVerse) >=
+          Number(selectedVerse)
+        ) {
+          endVerseSelect.value =
+            String(selectedEndVerse);
+        }
+
+
+        return {
+          startVerse:
+            Number(selectedVerse),
+
+          endVerse:
+            selectedEndVerse
+              ? Number(selectedEndVerse)
+              : null
+        };
+      }
+
+
+      return null;
+    }
+
+
+    function populateEndVerses(
+      verses,
+      startVerse
+    ) {
+      endVerseSelect.innerHTML =
+        `<option value="">Same verse</option>`;
+
+
+      verses
+        .filter(
+          item =>
+            Number(item.verse) >
+            Number(startVerse)
+        )
+        .forEach(
+          item => {
+
+            const option =
+              document.createElement(
+                "option"
+              );
+
+            option.value =
+              item.verse;
+
+            option.textContent =
+              item.verse;
+
+            endVerseSelect.appendChild(
+              option
+            );
+          }
+        );
+
+
+      endVerseSelect.disabled =
+        false;
+    }
+
+
+    async function loadPassage(
+      bookCode,
+      chapter,
+      startVerse,
+      endVerse = null
+    ) {
+      if (
+        !bookCode ||
+        !chapter ||
+        !startVerse
+      ) {
+        return;
+      }
+
+
+      setLoading(
+        "Opening Scripture…"
+      );
+
+
+      let path;
+
+
+      if (
+        endVerse &&
+        Number(endVerse) >
+        Number(startVerse)
+      ) {
+        path =
+          `/books/${encodeURIComponent(bookCode)}` +
+          `/chapters/${chapter}` +
+          `/verses/${startVerse}-${endVerse}`;
+      } else {
+        path =
+          `/books/${encodeURIComponent(bookCode)}` +
+          `/chapters/${chapter}` +
+          `/verses/${startVerse}`;
+      }
+
+
+      const data =
+        await api(path);
+
+
+      verseText.classList.remove(
+        "error"
+      );
+
+
+      if (Array.isArray(data.verses)) {
+        reference.textContent =
+          `${data.book.name} ` +
+          `${data.chapter}:` +
+          `${data.startVerse}-` +
+          `${data.endVerse}`;
+
+
+        verseText.innerHTML =
+          renderPassage(
+            data.verses
+          );
+
+
+        updateUrl(
+          data.book.code,
+          data.chapter,
+          data.startVerse,
+          data.endVerse
+        );
+      } else {
+        reference.textContent =
+          `${data.book.name} ` +
+          `${data.chapter}:` +
+          `${data.verse}`;
+
+
+        verseText.innerHTML = `
+          <p class="scripture-paragraph ${escapeHtml(data.paragraphStyle || "p")}">
+            <span class="verse">
+              <sup class="verse-number">
+                ${data.verse}
+              </sup>${escapeHtml(data.text)}
+            </span>
+          </p>
+        `;
+
+
+        updateUrl(
+          data.book.code,
+          data.chapter,
+          data.verse
+        );
+      }
+
+
+      hint.textContent =
+        "World English Bible";
+
+
+      clearLoading();
+    }
+
+
+    bookSelect.addEventListener(
+      "change",
+      async () => {
+
+        try {
+          const book =
+            bookSelect.value;
+
+
+          resetSelect(
+            chapterSelect,
+            "Choose chapter"
+          );
+
+          resetSelect(
+            verseSelect,
+            "Choose verse"
+          );
+
+          resetSelect(
+            endVerseSelect,
+            "Same verse"
+          );
+
+
+          if (!book) {
+            updateUrl(null);
+
+            reference.textContent =
+              "Begin reading";
+
+            verseText.textContent =
+              "Select a book above to begin.";
+
+            hint.textContent =
+              "Your place in Scripture will appear here.";
+
+            return;
+          }
+
+
+          updateUrl(book);
+
+          await loadChapters(
+            book
+          );
+
+        } catch (error) {
+          console.error(error);
+
+          showError(
+            "I couldn't load the chapters."
+          );
+        }
+      }
+    );
+
+
+    chapterSelect.addEventListener(
+      "change",
+      async () => {
+
+        try {
+          const book =
+            bookSelect.value;
+
+          const chapter =
+            chapterSelect.value;
+
+
+          resetSelect(
+            verseSelect,
+            "Choose verse"
+          );
+
+          resetSelect(
+            endVerseSelect,
+            "Same verse"
+          );
+
+
+          if (!chapter) {
+            updateUrl(book);
+            return;
+          }
+
+
+          updateUrl(
+            book,
+            chapter
+          );
+
+
+          await loadVerses(
+            book,
+            chapter
+          );
+
+        } catch (error) {
+          console.error(error);
+
+          showError(
+            "I couldn't load the verses."
+          );
+        }
+      }
+    );
+
+
+    verseSelect.addEventListener(
+      "change",
+      async () => {
+
+        try {
+          const book =
+            bookSelect.value;
+
+          const chapter =
+            chapterSelect.value;
+
+          const startVerse =
+            verseSelect.value;
+
+
+          if (!startVerse) {
+            resetSelect(
+              endVerseSelect,
+              "Same verse"
+            );
+
+            updateUrl(
+              book,
+              chapter
+            );
+
+            return;
+          }
+
+
+          const data =
+            await api(
+              `/books/${encodeURIComponent(book)}` +
+              `/chapters/${chapter}/verses`
+            );
+
+
+          populateEndVerses(
+            data.verses,
+            Number(startVerse)
+          );
+
+
+          endVerseSelect.value =
+            "";
+
+
+          await loadPassage(
+            book,
+            chapter,
+            startVerse
+          );
+
+        } catch (error) {
+          console.error(error);
+
+          showError(
+            "I couldn't load that verse."
+          );
+        }
+      }
+    );
+
+
+    endVerseSelect.addEventListener(
+      "change",
+      async () => {
+
+        try {
+          const book =
+            bookSelect.value;
+
+          const chapter =
+            chapterSelect.value;
+
+          const startVerse =
+            verseSelect.value;
+
+          const endVerse =
+            endVerseSelect.value;
+
+
+          if (!startVerse) {
+            return;
+          }
+
+
+          await loadPassage(
+            book,
+            chapter,
+            startVerse,
+            endVerse || null
+          );
+
+        } catch (error) {
+          console.error(error);
+
+          showError(
+            "I couldn't load that passage."
+          );
+        }
+      }
+    );
+
+
+    async function initialize() {
+      try {
+        const params =
+          getInitialParams();
+
+
+        const matchedBook =
+          await loadBooks(
+            params.book
+          );
+
+
+        if (!matchedBook) {
+          return;
+        }
+
+
+        const matchedChapter =
+          await loadChapters(
+            matchedBook.code,
+            params.chapter
+          );
+
+
+        if (!matchedChapter) {
+          updateUrl(
+            matchedBook.code
+          );
+
+          return;
+        }
+
+
+        const matchedVerses =
+          await loadVerses(
+            matchedBook.code,
+            matchedChapter,
+            params.startVerse,
+            params.endVerse
+          );
+
+
+        if (!matchedVerses) {
+          updateUrl(
+            matchedBook.code,
+            matchedChapter
+          );
+
+          return;
+        }
+
+
+        await loadPassage(
+          matchedBook.code,
+          matchedChapter,
+          matchedVerses.startVerse,
+          matchedVerses.endVerse
+        );
+
+      } catch (error) {
+        console.error(error);
+
+        showError(
+          "I couldn't initialize the Bible reader."
+        );
+      }
+    }
+
+
+    initialize();
+
+  </script>
+
+</body>
+</html>

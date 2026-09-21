@@ -1,0 +1,94 @@
+# ----------------------------------
+# Terraform
+# ----------------------------------
+
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+
+crash.log
+crash.*.log
+
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+.terraformrc
+terraform.rc
+
+# Terraform variable files may contain secrets
+*.tfvars
+*.tfvars.json
+
+# Keep example variable files
+!*.tfvars.example
+
+
+# ----------------------------------
+# AWS / deployment artifacts
+# ----------------------------------
+
+.aws/
+dist/
+build/
+.deploy/
+
+
+# ----------------------------------
+# Environment / secrets
+# ----------------------------------
+
+.env
+.env.*
+!.env.example
+
+*.pem
+*.key
+*.p12
+
+
+# ----------------------------------
+# macOS
+# ----------------------------------
+
+.DS_Store
+.AppleDouble
+.LSOverride
+
+
+# ----------------------------------
+# Windows
+# ----------------------------------
+
+Thumbs.db
+Desktop.ini
+
+
+# ----------------------------------
+# Editors / IDEs
+# ----------------------------------
+
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+
+# ----------------------------------
+# Logs
+# ----------------------------------
+
+*.log
+logs/
+
+
+# ----------------------------------
+# Temporary files
+# ----------------------------------
+
+tmp/
+temp/
+.cache/
